@@ -1,27 +1,14 @@
-export const Fixtures = ({ matches, teams, setTeams }) => {
-
-  const handleWin = (winnerName, loserName) => {
-
-    const updatedTeams = teams.map((team) => {
-
-      if (team.name === winnerName) {
-        return {
-          ...team,
-          points: team.points + 2,
-          matchesPlayed: team.matchesPlayed + 1,
-          wins: team.wins + 1,
-        };
+export const Fixtures = ({ matches, setMatches }) => {
+  
+  const handleResult = (index, winnerName) => {
+    const updatedMatches = matches.map((match, i) => {
+      if (i === index) {
+        return { ...match, result: winnerName };
       }
-      if (team.name === loserName) {
-        return {
-            ...team,
-            matchesPlayed: team.matchesPlayed + 1,
-            losses: team.losses + 1,
-        };
-      }
-        return team;
+      return match;
     });
-    setTeams(updatedTeams);
+
+    setMatches(updatedMatches);
   };
 
   return (
@@ -33,10 +20,10 @@ export const Fixtures = ({ matches, teams, setTeams }) => {
           return (
             <li key={index}>
               {match.team1} vs {match.team2}
-              <button onClick={() => handleWin(match.team1)}>
+              <button onClick={() => handleResult(index, match.team1)}>
                 {match.team1} Wins
               </button>
-              <button onClick={() => handleWin(match.team2)}>
+              <button onClick={() => handleResult(index, match.team2)}>
                 {match.team2} Wins
               </button>
             </li>
