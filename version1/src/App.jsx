@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Fixtures } from "../components/Fixtures";
 import { GameHeader } from "../components/GameHeader";
 import { PointsTable } from "../components/PointsTable";
@@ -41,61 +41,15 @@ const allTeams = [
   },
 ];
 
-const matches = [
-  {
-    team1: "Netherlands",
-    team2: "Pakistan",
-    result: null,
-  },
-  {
-    team1: "USA",
-    team2: "India",
-    result: null,
-  },
-  {
-    team1: "Netherlands",
-    team2: "Namibia",
-    result: null,
-  },
-  {
-    team1: "Pakistan",
-    team2: "USA",
-    result: null,
-  },
-  {
-    team1: "Namibia",
-    team2: "India",
-    result: null,
-  },
-  {
-    team1: "USA",
-    team2: "Netherlands",
-    result: null,
-  },
-  {
-    team1: "USA",
-    team2: "Namibia",
-    result: null,
-  },
-  {
-    team1: "India",
-    team2: "Pakistan",
-    result: null,
-  },
-  {
-    team1: "Pakistan",
-    team2: "Namibia",
-    result: null,
-  },
-  {
-    team1: "India",
-    team2: "Netherlands",
-    result: null,
-  },
-];
-
 function App() {
-  const [matchState, setMatchState] = useState(matches);
+  const [matchState, setMatchState] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/matches")
+      .then(res => res.json())
+      .then(data => setMatchState(data))
+      .catch(err => console.log(err));
+  }, []);
 
   const calucaltedTeams = allTeams.map((team) => {
     let wins = 0;
@@ -120,11 +74,21 @@ function App() {
   });
 
   const sortedTeams = [...calucaltedTeams].sort((a, b) => b.points - a.points);
+  const handleReset = async () => {
+  await fetch("http://localhost:5000/reset", {
+    method: "PUT",
+  });
+
+  const res = await fetch("http://localhost:5000/matches");
+  const data = await res.json();
+
+  setMatchState(data);
+};
 
   return (
     <>
       <GameHeader />
-      <button onClick={() => setMatchState(matches)}>Reset Table</button>
+      <button onClick={handleReset}>Reset Table</button>
       <PointsTable teams={sortedTeams} />
       <Fixtures matches={matchState} setMatches={setMatchState} />
     </>

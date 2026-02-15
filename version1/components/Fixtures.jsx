@@ -1,14 +1,24 @@
 import "./../src/index.css";
 
 export const Fixtures = ({ matches, setMatches }) => {
-  const handleResult = (index, winnerName) => {
-    const updatedMatches = matches.map((match, i) => {
-      if (i === index) {
-        return { ...match, result: winnerName };
-      }
-      return match;
+
+  const handleResult =async (index, winnerName) => {
+
+    const matchId = matches[index]._id;
+
+    const res = await fetch(`http://localhost:5000/matches/${matchId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ result: winnerName }),
     });
 
+    const updatedMatch = await res.json();
+
+    const updatedMatches = matches.map((match, i) => 
+      i === index ? updatedMatch : match
+    );
     setMatches(updatedMatches);
   };
 
