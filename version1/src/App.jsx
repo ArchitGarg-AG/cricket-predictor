@@ -45,7 +45,7 @@ function App() {
   };
 
   return (
-    <>
+    <div className="container">
       <GameHeader />
       <button onClick={handleReset}>Reset Table</button>
       {loading && <p>Loading...</p>}
@@ -54,7 +54,7 @@ function App() {
       <PointsTable teams={sortedTeams} />
       <Fixtures matches={matchState} setMatches={setMatchState} />
       <Playoffs qualifier1={qualifier1} eliminator={eliminator} />
-    </>
+    </div>
   );
 }
 

@@ -6,49 +6,9 @@ export const MatchCard = ({
   matchInputs,
 }) => {
   return (
-    <li key={match._id} className="match-card">
+    <li key={match._id} className="card">
       <div className="match-title">
         {match.team1} vs {match.team2}
-      </div>
-
-      <div className="score-row">
-        <div className="team-score">
-          <input
-            type="number"
-            placeholder="Runs"
-            value={matchInputs[match._id]?.team1Runs || ""}
-            onChange={(e) =>
-              handleInputChange(match._id, "team1Runs", e.target.value)
-            }
-          />
-          <input
-            type="text"
-            placeholder="Overs"
-            value={matchInputs[match._id]?.team1Overs || ""}
-            onChange={(e) =>
-              handleInputChange(match._id, "team1Overs", e.target.value)
-            }
-          />
-        </div>
-
-        <div className="team-score">
-          <input
-            type="number"
-            placeholder="Runs"
-            value={matchInputs[match._id]?.team2Runs || ""}
-            onChange={(e) =>
-              handleInputChange(match._id, "team2Runs", e.target.value)
-            }
-          />
-          <input
-            type="text"
-            placeholder="Overs"
-            value={matchInputs[match._id]?.team2Overs || ""}
-            onChange={(e) =>
-              handleInputChange(match._id, "team2Overs", e.target.value)
-            }
-          />
-        </div>
       </div>
 
       <div className="match-buttons">
@@ -70,6 +30,13 @@ export const MatchCard = ({
           {match.team2}
         </button>
 
+        <button
+          className={match.result === "NR" ? "win-btn active" : "win-btn"}
+          onClick={() => handleResult(index, "NR")}
+        >
+          No Result
+        </button>
+
         {match.result && (
           <button
             className="clear-btn"
@@ -79,6 +46,56 @@ export const MatchCard = ({
           </button>
         )}
       </div>
+
+      {match.result && match.result !== "NR" && (
+        <div className="score-row">
+          <div className="team-score">
+            <input
+              type="number"
+              min="0"
+              placeholder="Runs"
+              value={matchInputs[match._id]?.team1Runs || ""}
+              onChange={(e) =>
+                handleInputChange(match._id, "team1Runs", e.target.value)
+              }
+            />
+            <input
+              type="number"
+              min="5"
+              max="20"
+              step="0.1"
+              placeholder="Overs"
+              value={matchInputs[match._id]?.team1Overs || ""}
+              onChange={(e) =>
+                handleInputChange(match._id, "team1Overs", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="team-score">
+            <input
+              type="number"
+              min="0"
+              placeholder="Runs"
+              value={matchInputs[match._id]?.team2Runs || ""}
+              onChange={(e) =>
+                handleInputChange(match._id, "team2Runs", e.target.value)
+              }
+            />
+            <input
+              type="number"
+              min="5"
+              max="20"
+              step="0.1"
+              placeholder="Overs"
+              value={matchInputs[match._id]?.team2Overs || ""}
+              onChange={(e) =>
+                handleInputChange(match._id, "team2Overs", e.target.value)
+              }
+            />
+          </div>
+        </div>
+      )}
     </li>
   );
 };

@@ -3,7 +3,7 @@ export const convertOvers = (overs) => {
 
   const parts = overs.split(".");
   const overPart = parseInt(parts[0]);
-  const ballPart = parseInt(parts[1] || "0");
+  const ballPart = Math.min(parseInt(parts[1] || "0"), 5);
 
   return overPart + ballPart / 6;
 };
@@ -14,6 +14,7 @@ export const calculateStandings = (teams, matches) => {
     let losses = 0;
     let matchesPlayed = 0;
     let points = 0;
+    let noResults = 0;
 
     let totalRunsScored = 0;
     let totalOverFaced = 0;
@@ -23,37 +24,34 @@ export const calculateStandings = (teams, matches) => {
     matches.forEach((match) => {
       if (!match.result) return;
 
-      if (match.team1 === team.name) {
-        matchesPlayed++;
+      const isTeam1 = match.team1 === team.name;
+      const isTeam2 = match.team2 === team.name;
 
-        totalRunsScored += match.team1Runs || 0;
-        totalOverFaced += convertOvers(match.team1Overs);
+      if (!isTeam1 && !isTeam2) return;
 
-        totalRunsConceded += match.team2Runs || 0;
-        totalOversBowled += convertOvers(match.team2Overs);
+      matchesPlayed++;
 
-        if (match.result === team.name) {
-          wins++;
-          points += 2;
-        } else {
-          losses++;
-        }
+      const teamRuns = isTeam1 ? match.team1Runs : match.team2Runs;
+      const teamOvers = isTeam1 ? match.team1Overs : match.team2Overs;
+      const oppRuns = isTeam1 ? match.team2Runs : match.team1Runs;
+      const oppOvers = isTeam1 ? match.team2Overs : match.team1Overs;
+
+      if (teamRuns > 0 && oppRuns > 0) {
+        totalRunsScored += teamRuns;
+        totalOverFaced += convertOvers(teamOvers);
+
+        totalRunsConceded += oppRuns;
+        totalOversBowled += convertOvers(oppOvers);
       }
-      if (match.team2 === team.name) {
-        matchesPlayed++;
 
-        totalRunsScored += match.team2Runs || 0;
-        totalOverFaced += convertOvers(match.team2Overs);
-
-        totalRunsConceded += match.team1Runs || 0;
-        totalOversBowled += convertOvers(match.team1Overs);
-
-        if (match.result === team.name) {
-          wins++;
-          points += 2;
-        } else {
-          losses++;
-        }
+      if (match.result === team.name) {
+        wins++;
+        points += 2;
+      } else if (match.result === "NR") {
+        noResults++;
+        points += 1;
+      } else {
+        losses++;
       }
     });
 
@@ -62,21 +60,22 @@ export const calculateStandings = (teams, matches) => {
       nrr =
         totalRunsScored / totalOverFaced - totalRunsConceded / totalOversBowled;
     }
+
     return {
       ...team,
       wins,
       losses,
       matchesPlayed,
       points,
+      noResults,
       totalRunsScored,
       totalOverFaced,
       totalRunsConceded,
       totalOversBowled,
-      nrr: nrr.toFixed(3),
+      nrr: Number(nrr.toFixed(3)),
     };
   });
 };
-
 
 export const sortStandings = (teams) => {
   return [...teams].sort((a, b) => {

@@ -52,7 +52,7 @@ export const Playoffs = ({ qualifier1, eliminator }) => {
       : null;
 
   return (
-    <div style={{ marginTop: "30px" }}>
+    <div style={{ marginTop: "30px" }} className="card">
       <h2>Playoffs</h2>
 
       <div className="match-card">
