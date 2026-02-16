@@ -11,10 +11,10 @@ exports.getMatches = async (req, res) => {
 
 exports.updateMatch = async (req, res) => {
     try {
-        const {result} = req.body
+        const {team1Runs, team2Runs, team1Overs, team2Overs, result} = req.body
         const updatedMatch = await Match.findByIdAndUpdate(
             req.params.id,
-            { result },
+            { team1Runs, team2Runs, team1Overs, team2Overs, result },
             { new: true }
         );
         res.json(updatedMatch);

@@ -12,6 +12,7 @@ export const PointsTable = ({ teams }) => {
             <th>Matches Played</th>
             <th>Wins</th>
             <th>Losses</th>
+            <th>NRR</th>
           </tr>
         </thead>
 
@@ -20,8 +21,8 @@ export const PointsTable = ({ teams }) => {
             <tr
               key={team.name}
               style={{
-                backgroundColor: index < 2 ? "#3d9d28" : "",
-                fontWeight: index < 2 ? "bold" : "normal",
+                backgroundColor: index < 4 ? "#3d9d28" : "",
+                fontWeight: index < 4 ? "bold" : "normal",
               }}
             >
               <td>{index + 1}</td>
@@ -30,6 +31,7 @@ export const PointsTable = ({ teams }) => {
               <td>{team.matchesPlayed}</td>
               <td>{team.wins}</td>
               <td>{team.losses}</td>
+              <td>{team.nrr}</td>
             </tr>
           ))}
         </tbody>

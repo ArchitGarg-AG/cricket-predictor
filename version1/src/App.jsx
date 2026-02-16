@@ -1,96 +1,59 @@
 import { useState, useEffect } from "react";
-import { Fixtures } from "../components/Fixtures";
-import { GameHeader } from "../components/GameHeader";
-import { PointsTable } from "../components/PointsTable";
 
-const allTeams = [
-  {
-    name: "India",
-    points: 0,
-    matchesPlayed: 0,
-    wins: 0,
-    losses: 0,
-  },
-  {
-    name: "Pakistan",
-    points: 0,
-    matchesPlayed: 0,
-    wins: 0,
-    losses: 0,
-  },
-  {
-    name: "USA",
-    points: 0,
-    matchesPlayed: 0,
-    wins: 0,
-    losses: 0,
-  },
-  {
-    name: "Namibia",
-    points: 0,
-    matchesPlayed: 0,
-    wins: 0,
-    losses: 0,
-  },
-  {
-    name: "Netherlands",
-    points: 0,
-    matchesPlayed: 0,
-    wins: 0,
-    losses: 0,
-  },
-];
+import { Fixtures } from "./components/fixtures/Fixtures";
+import { GameHeader } from "./components/layout/GameHeader";
+import { PointsTable } from "./components/table/PointsTable";
+import { Playoffs } from "./components/playoffs/Playoffs";
+import { calculateStandings, sortStandings } from "./utils/cricketUtils";
+import { fetchMatches, resetMatchesApi } from "./api/matchApi";
+import { allTeams } from "./data/teams";
+import "./index.css";
+
 
 function App() {
   const [matchState, setMatchState] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/matches")
-      .then(res => res.json())
-      .then(data => setMatchState(data))
-      .catch(err => console.log(err));
+    fetchMatches()
+      .then((data) => setMatchState(data))
+      .catch(() => setError("Failed to load matches"))
+      .finally(() => setLoading(false));
   }, []);
 
-  const calucaltedTeams = allTeams.map((team) => {
-    let wins = 0;
-    let losses = 0;
-    let matchesPlayed = 0;
-    let points = 0;
+  const calculatedTeams = calculateStandings(allTeams, matchState);
+  const sortedTeams = sortStandings(calculatedTeams);
 
-    matchState.forEach((match) => {
-      if (match.result) {
-        if (match.team1 === team.name || match.team2 === team.name) {
-          matchesPlayed += 1;
-          if (match.result === team.name) {
-            wins += 1;
-            points += 2;
-          } else {
-            losses += 1;
-          }
-        }
-      }
-    });
-    return { ...team, wins, losses, matchesPlayed, points };
-  });
+  const allMatchesPlayed = matchState.length > 0 && matchState.every((match) => match.result !== null);
+  const top4 = sortedTeams.slice(0, 4);
+  const qualifier1 =
+    allMatchesPlayed && top4.length === 4
+      ? { team1: top4[0].name, team2: top4[1].name }
+      : null;
 
-  const sortedTeams = [...calucaltedTeams].sort((a, b) => b.points - a.points);
+  const eliminator =
+    allMatchesPlayed && top4.length === 4
+      ? { team1: top4[2].name, team2: top4[3].name }
+      : null;
+
   const handleReset = async () => {
-  await fetch("http://localhost:5000/reset", {
-    method: "PUT",
-  });
+    await resetMatchesApi();
 
-  const res = await fetch("http://localhost:5000/matches");
-  const data = await res.json();
-
-  setMatchState(data);
-};
+    const data = await fetchMatches();
+    setMatchState(data);
+  };
 
   return (
     <>
       <GameHeader />
       <button onClick={handleReset}>Reset Table</button>
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+
       <PointsTable teams={sortedTeams} />
       <Fixtures matches={matchState} setMatches={setMatchState} />
+      <Playoffs qualifier1={qualifier1} eliminator={eliminator} />
     </>
   );
 }

@@ -17,22 +17,33 @@ app.get("/seed", async (req, res) => {
   try {
     await Match.deleteMany();
 
-    const matches = [
-      { team1: "Netherlands", team2: "Pakistan" },
-      { team1: "USA", team2: "India" },
-      { team1: "Netherlands", team2: "Namibia" },
-      { team1: "Pakistan", team2: "USA" },
-      { team1: "Namibia", team2: "India" },
-      { team1: "USA", team2: "Netherlands" },
-      { team1: "USA", team2: "Namibia" },
-      { team1: "India", team2: "Pakistan" },
-      { team1: "Pakistan", team2: "Namibia" },
-      { team1: "India", team2: "Netherlands" },
+    const teams = [
+      "Mumbai Indians",
+      "Chennai Super Kings",
+      "Royal Challengers Bengaluru",
+      "Kolkata Knight Riders",
+      "Rajasthan Royals",
+      "Delhi Capitals",
+      "Sunrisers Hyderabad",
+      "Punjab Kings",
+      "Gujarat Titans",
+      "Lucknow Super Giants"
     ];
+
+    let matches = [];
+
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        matches.push({
+          team1: teams[i],
+          team2: teams[j]
+        });
+      }
+    }
 
     await Match.insertMany(matches);
 
-    res.send("match loaded finallyyyyyyyyy");
+    res.send("45 IPL matches generated successfully 🚀");
   } catch (err) {
     res.status(500).send(err);
   }
