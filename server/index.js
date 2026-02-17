@@ -8,7 +8,17 @@ const Match = require("./models/Match");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://cricket-predictor-delta.vercel.app"
+        ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 connectDB();
