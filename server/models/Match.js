@@ -1,34 +1,43 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const mmatchSchema = new mongoose.Schema({
-    team1: {
-        type: String,
-        required: true
-    },
-    team2: {
-        type: String,
-        required: true,
-    },
-    team1Runs: {
-        type: Number,
-        default: 0
-    },
-    team2Runs: {
-        type: Number,
-        default: 0
-    },
-    team1Overs: {
-        type: String,
-        default: "0.0"
-    },
-    team2Overs: {
-        type: String,
-        default: "0.0"
-    },
-    result: {
-        type: String,
-        default: null
-    }
+  leagueId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "League",
+    required: true,
+  },
+
+  season: {
+    type: String,
+  },
+  matchNumber: {
+    type: Number,
+  },
+
+  teamA: {
+    type: String,
+  },
+  teamB: {
+    type: String,
+  },
+  venue: {
+    type: String,
+  },
+  date: {
+    type: Date,
+  },
+  status: {
+    type: String,
+    enum: ["upcoming", "live", "completed"],
+    default: "upcoming",
+  },
+
+  result: String,
+
+  runsA: Number,
+  runsB: Number,
+  overA: Number,
+  overB: Number,
 });
 
-module.exports = mongoose.model('Match', mmatchSchema);
+module.exports = mongoose.model("Match", mmatchSchema);
